@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dual N-Back cognitive training game — improve your working memory with this scientifically-backed brain training exercise." />
+  <title>Dual N-Back — Cognitive Training</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="app-bg"></div>
+
+    <div class="app-container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="2" y="2" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.3"/>
+                <rect x="12" y="2" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.5"/>
+                <rect x="22" y="2" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.3"/>
+                <rect x="2" y="12" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.5"/>
+                <rect x="12" y="12" width="8" height="8" rx="2" fill="#6c5ce7"/>
+                <rect x="22" y="12" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.5"/>
+                <rect x="2" y="22" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.3"/>
+                <rect x="12" y="22" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.5"/>
+                <rect x="22" y="22" width="8" height="8" rx="2" fill="#6c5ce7" opacity="0.3"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <h1>Dual N-Back</h1>
+              <p class="logo-subtitle">Cognitive Training</p>
+            </div>
+          </div>
+          <div class="n-level-display">
+            <span class="n-level-label">N-Level</span>
+            <span class="n-level-value" id="header-n-level">2</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Game Layout -->
+      <div class="game-layout">
+        <!-- Left Panel — Scores -->
+        <div class="panel panel-left">
+          <div class="scoreboard">
+            <h3 class="scoreboard-title">Performance</h3>
+
+            <div class="score-card score-card--overall">
+              <div class="score-card-header">
+                <span class="score-card-label">Overall</span>
+                <span class="score-card-pct" id="overall-pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-bar-fill progress-bar-fill--overall" id="overall-bar" style="width:0%"></div>
+              </div>
+              <div class="score-card-detail">
+                <span id="total-trials">0 eligible trials</span>
+              </div>
+            </div>
+
+            <div class="score-card">
+              <div class="score-card-header">
+                <span class="score-card-label">
+                  <span class="score-dot score-dot--visual"></span>Visual (V)
+                </span>
+                <span class="score-card-pct" id="visual-pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-bar-fill progress-bar-fill--visual" id="visual-bar" style="width:0%"></div>
+              </div>
+              <div class="score-card-stats">
+                <span class="stat stat--hit">✓ <span id="visual-hits">0</span></span>
+                <span class="stat stat--miss">✗ <span id="visual-misses">0</span></span>
+                <span class="stat stat--fp">⚠ <span id="visual-fp">0</span></span>
+              </div>
+            </div>
+
+            <div class="score-card">
+              <div class="score-card-header">
+                <span class="score-card-label">
+                  <span class="score-dot score-dot--audio"></span>Audio (A)
+                </span>
+                <span class="score-card-pct" id="audio-pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-bar-fill progress-bar-fill--audio" id="audio-bar" style="width:0%"></div>
+              </div>
+              <div class="score-card-stats">
+                <span class="stat stat--hit">✓ <span id="audio-hits">0</span></span>
+                <span class="stat stat--miss">✗ <span id="audio-misses">0</span></span>
+                <span class="stat stat--fp">⚠ <span id="audio-fp">0</span></span>
+              </div>
+            </div>
+
+            <div class="score-legend">
+              <span class="stat stat--hit">✓ Hits</span>
+              <span class="stat stat--miss">✗ Misses</span>
+              <span class="stat stat--fp">⚠ False +</span>
+            </div>
+          </div>
+
+          <!-- Progress Graph -->
+          <div class="graph-section" id="graph-section" style="display:none">
+            <h3 class="scoreboard-title">Progress</h3>
+            <div class="graph-card">
+              <canvas id="progress-graph" width="230" height="140"></canvas>
+              <div class="graph-stats">
+                <span class="graph-stat" id="graph-accuracy">Accuracy: —</span>
+                <span class="graph-stat" id="graph-trials">0 / 20 trials</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center — Grid + Match Buttons -->
+        <div class="panel panel-center">
+          <div class="trial-indicator">
+            <span class="trial-badge" id="trial-badge" style="display:none">
+              Trial <strong id="trial-number">—</strong>
+            </span>
+            <span class="letter-badge" id="letter-badge" style="display:none"></span>
+            <span class="debug-letter" id="debug-letter" style="display:none" title="Current letter (debug)"></span>
+            <span class="pause-badge" id="pause-badge" style="display:none">PAUSED</span>
+          </div>
+
+          <div class="grid-container">
+            <div class="grid" id="game-grid"></div>
+          </div>
+
+          <div class="match-buttons">
+            <button class="match-btn match-btn--visual match-btn--disabled" id="btn-visual-match" disabled>
+              <span class="match-btn-key">V</span>
+              <span class="match-btn-label">Position Match</span>
+            </button>
+            <button class="match-btn match-btn--audio match-btn--disabled" id="btn-audio-match" disabled>
+              <span class="match-btn-key">A</span>
+              <span class="match-btn-label">Audio Match</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Panel — Controls -->
+        <div class="panel panel-right">
+          <div class="controls">
+            <div class="controls-section">
+              <h3 class="controls-title">Game Controls</h3>
+              <div class="controls-buttons" id="controls-buttons">
+                <button class="btn btn-primary" id="btn-start">
+                  <span class="btn-icon">▶</span> Start Game
+                </button>
+              </div>
+            </div>
+
+            <div class="controls-section">
+              <h3 class="controls-title">N-Level</h3>
+              <div class="n-selector" id="n-selector"></div>
+              <p class="controls-hint" id="n-hint" style="display:none">Stop game to change N-level</p>
+            </div>
+
+            <div class="controls-section">
+              <h3 class="controls-title">
+                Trials <span class="speed-value" id="trials-label">20</span>
+              </h3>
+              <div class="trials-input-row">
+                <input type="number" id="trials-input" class="trials-input" min="10" max="100" step="1" value="20" />
+                <span class="trials-hint">10 – 100</span>
+              </div>
+            </div>
+
+            <div class="controls-section">
+              <h3 class="controls-title">
+                Speed <span class="speed-value" id="speed-label">1.5s</span>
+              </h3>
+              <input type="range" id="speed-slider" class="slider" min="500" max="3000" step="100" value="1500" />
+              <div class="slider-labels">
+                <span>Fast (0.5s)</span>
+                <span>Slow (3.0s)</span>
+              </div>
+            </div>
+
+            <div class="controls-section controls-help">
+              <h3 class="controls-title">How to Play</h3>
+              <ul class="help-list">
+                <li>Watch the grid &amp; listen to letters</li>
+                <li>Press <kbd>V</kbd> if the <strong>position</strong> matches <span id="help-n">2</span> steps ago</li>
+                <li>Press <kbd>A</kbd> if the <strong>sound</strong> matches <span id="help-n2">2</span> steps ago</li>
+                <li>Both can match simultaneously!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <p>
+          Press <kbd>V</kbd> for visual match · <kbd>A</kbd> for audio match · <kbd>Space</kbd> to start/pause
+        </p>
+      </footer>
+    </div>
+  </div>
+
+  <script type="module" src="./game.js"></script>
+</body>
+</html>

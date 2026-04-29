@@ -39,6 +39,7 @@ A professional Dual N-Back web application built using React to improve working 
 ## 🌐 Deployment
 
 This app is deployed using Vercel and can be accessed from any device via a public URL.
+https://dual-n-back-game.vercel.app/
 
 ---
 
